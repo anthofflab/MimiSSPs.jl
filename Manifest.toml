@@ -432,9 +432,9 @@ version = "0.6.8"
 
 [[Mimi]]
 deps = ["CSVFiles", "Classes", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "Electron", "FileIO", "FilePaths", "GlobalSensitivityAnalysis", "GraphPlot", "IterTools", "IteratorInterfaceExtensions", "JSON", "LightGraphs", "LinearAlgebra", "Logging", "MacroTools", "MetaGraphs", "NamedArrays", "Pkg", "ProgressMeter", "Random", "Serialization", "Statistics", "StatsBase", "StringBuilders", "TableTraits", "VegaLite"]
-git-tree-sha1 = "265766488a3c7c4e45a2dbeaea0c2de9e02208f8"
+path = "/Users/lisarennels/.julia/dev/Mimi"
 uuid = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
-version = "1.3.0"
+version = "1.3.1-DEV"
 
 [[Missings]]
 deps = ["DataAPI"]

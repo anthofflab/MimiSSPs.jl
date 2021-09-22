@@ -3,14 +3,13 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
 @defcomp SSPs begin
 
-    countries = Index()
-
     model   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, and PIK GDP_32
     ssp     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP5
+    country_names = Parameter{String}(index=[countries]) # need the names of the countries from the dimension
 
     # TODO double check units on gases, do we want any other gases or parameters?
-    population      = Variable(index=[time,region], unit="million")
-    gdp             = Variable(index=[time,region], unit="billion US\$2005/yr")
+    population      = Variable(index=[time, countries], unit="million")
+    gdp             = Variable(index=[time, countries], unit="billion US\$2005/yr")
 
     co2_emissions   = Variable(index=[time], unit="GtC")
     ch4_emissions   = Variable(index=[time], unit="MtCH4")
@@ -21,16 +20,15 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
         # ----------------------------------------------------------------------
         # Checks
-        println("\n-- CHECKS --\n")
 
         model_options = ["IIASA GDP", "OECD Env-Growth", "PIK GDP_23"]
         !(p.model in model_options) && error("Model $(p.model) provided to SSPs component model parameter not found in available list: $(model_options)")
+        
         ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
-        !(p.ssp in ssp_options) && error("Model $(p.ssp) provided to SSPs component ssp parameter not found in available list: $(ssp_options)")
+        !(p.ssp in ssp_options) && error("SSP $(p.ssp) provided to SSPs component ssp parameter not found in available list: $(ssp_options)")
 
         # ----------------------------------------------------------------------
         # Settings
-        println("\n-- SETTINGS --\n")
 
         emissions_path_dict = Dict(
             :SSP1 => "ssp126",  # paired with ssp1 RCP 2.6
@@ -44,16 +42,11 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
         # ----------------------------------------------------------------------
         # Load Data as Needed
-        println("\n-- LOAD DATA --\n")
 
-        key = Symbol(p.model, "-", p.ssp)
-        if !haskey(g_datasets, key)
+        dict_key = Symbol(p.model, "-", p.ssp)
+        if !haskey(g_datasets, dict_key)
 
             # interpolate socioeconomic data to annual
-            
-            # TODO we can do this outside of the function in calibration, but for 
-            # now it's cleaner to keep input data as Bryan's outputs with units etc.
-            # and do this here -- it is quite fast and only done once per dataset key
 
             socioeconomic_data = load(socioeconomic_path) |> 
                 DataFrame|> 
@@ -81,7 +74,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
             # add interpolated socioeconomic data, and emissions data which is already
             # annual, to the datasets global variable
-            g_datasets[key] = Dict(
+            g_datasets[dict_key] = Dict(
                 :socioeconomic => socioeconomic_data_interp,
                 :emissions => load(emissions_path, skiplines_begin = 6)|> 
                     DataFrame |> 
@@ -93,62 +86,58 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         end
 
         # ----------------------------------------------------------------------
-        # Output Variables
+        # Check Countries - each country found in the model countries parameter
+        # must exist in the ssp socioeconomics dataframe 
 
-        # d is a DimValueDict where most keys have the labels of that dimension,
-        # but :time is a vector of AbstractTimesteps, each of which we can call
-        # Mimi.gettime on to get the year
-
-        ## SOCIOECONOMIC -- annual 2010 to 2015 by IIASA 3-letter country code
-        # TOOD we have missing data for some countries
-        println("\n-- SETTING SOCIOECONOMIC DATA --\n")
-
-        # loop over all model timesteps (years)
-        for t in d.time
-            println("running time $(gettime(t))")
-            if gettime(t) in unique(g_datasets[key][:socioeconomic].year)
-
-                # loop over all model regions (countries)
-                for c in d.countries
-                    if c in unique(g_datasets[key][:socioeconomic].region) # only proceed if this country is in the data
-
-                        v.population[t, c] = (g_datasets[key][:socioeconomic] |>
-                                        @filter(_.year == gettime(t) && _.region == c) |>
-                                        DataFrame).pop
-                        
-                        v.gdp[t, c] = (g_datasets[key][:socioeconomic] |>
-                                        @filter(_.year == gettime(t) && _.region == c) |>
-                                        DataFrame).pop
-
-                    end
-                end
-            end
+        missing_countries = []
+        for country in p.country_names
+            !(country in unique(g_datasets[dict_key][:socioeconomic].region)) && push!(missing_countries, country)
         end
-
-        ## EMISSIONS -- annual 1750 to 2500
-        println("\n-- SETTING EMISSIONS DATA --\n")
-
-        for t in d.time
-            if gettime(t) in unique(g_datasets[key][:emissions].year)
-
-                v.co2_emissions[t] = (g_datasets[key][:emissions] |>
-                                    @filter(_.year == gettime(t)) |>
-                                    DataFrame).carbon_dioxide
-                v.ch4_emissions[t] = (g_datasets[key][:emissions] |>
-                                    @filter(_.year == gettime(t)) |>
-                                    DataFrame).methane
-                v.n2o_emissions[t] = (g_datasets[key][:emissions] |>
-                                    @filter(_.year == gettime(t)) |>
-                                    DataFrame).nitrous_oxide
-                v.sf6_emissions[t] = (g_datasets[key][:emissions] |>
-                                    @filter(_.year == gettime(t)) |>
-                                    DataFrame).sf6
-
-            end
-        end
+        !isempty(missing_countries) && error("All countries in countries parameter must be found in SSPs component Socioeconomic Dataframe, the following were not found: $(missing_countries)")
     end
 
     function run_timestep(p,v,d,t)
-    end
 
+        dict_key = Symbol(p.model, "-", p.ssp)
+        year_label = gettime(t)
+
+        # check that we only run the component where we have data
+        if !(year_label in unique(g_datasets[dict_key][:socioeconomic].year))
+            error("Cannot run SSP component in year $(year_label), SSP socioeconomic variables only available for 2010 through 2300.")
+        end
+        if !(year_label in unique(g_datasets[dict_key][:emissions].year))
+            error("Cannot run SSP component in year $(year_label), SSP emissions variables only available for 1750 through 2500.")
+        end
+
+        # ----------------------------------------------------------------------
+        # Socioeconomic
+
+        # filter the dataframe for values with the year matching timestep
+        # t and only the ssp countries found in the model countries list,
+        # already checked that all model countries are in ssp countries list
+        subset = g_datasets[dict_key][:socioeconomic] |>
+            @filter(_.year == gettime(t) && _.region in p.country_names) |>
+            DataFrame
+
+        # get the ordered indices of the ssp countries within the parameter 
+        # of the model countries, already checked that all model countries
+        # are in ssp countries list
+        order = indexin(p.country_names, subset.region)
+
+        v.population[t,:] = subset.pop[order]
+        v.gdp[t,:] = subset.gdp[order]
+
+        # ----------------------------------------------------------------------
+        # Emissions
+
+        subset = g_datasets[dict_key][:emissions] |>
+                    @filter(_.year == gettime(t)) |>
+                    DataFrame
+
+        v.co2_emissions[t] = subset.carbon_dioxide[1]
+        v.ch4_emissions[t] = subset.methane[1]
+        v.n2o_emissions[t] = subset.nitrous_oxide[1]
+        v.sf6_emissions[t] = subset.sf6[1]
+
+    end
 end
