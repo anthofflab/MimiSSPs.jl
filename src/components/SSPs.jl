@@ -3,14 +3,14 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
 @defcomp SSPs begin
 
-    countries = Dimension()
+    countries = Index()
 
-    model::String   = Parameter() # can be one of IIASA, OECD Env-Growth, and PIK GDP_32
-    ssp::String     = Parameter() # can be one of SSP1, SSP2, SSP3, SSP5
+    model   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, and PIK GDP_32
+    ssp     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP5
 
     # TODO double check units on gases, do we want any other gases or parameters?
     population      = Variable(index=[time,region], unit="million")
-    gdp             = Variable(index=[time,region], unit="billion US$2005/yr")
+    gdp             = Variable(index=[time,region], unit="billion US\$2005/yr")
 
     co2_emissions   = Variable(index=[time], unit="GtC")
     ch4_emissions   = Variable(index=[time], unit="MtCH4")
@@ -20,7 +20,17 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
     function init(p,v,d)
 
         # ----------------------------------------------------------------------
+        # Checks
+        println("\n-- CHECKS --\n")
+
+        model_options = ["IIASA GDP", "OECD Env-Growth", "PIK GDP_23"]
+        !(p.model in model_options) && error("Model $(p.model) provided to SSPs component model parameter not found in available list: $(model_options)")
+        ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
+        !(p.ssp in ssp_options) && error("Model $(p.ssp) provided to SSPs component ssp parameter not found in available list: $(ssp_options)")
+
+        # ----------------------------------------------------------------------
         # Settings
+        println("\n-- SETTINGS --\n")
 
         emissions_path_dict = Dict(
             :SSP1 => "ssp126",  # paired with ssp1 RCP 2.6
@@ -29,11 +39,12 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
             :SSP5 => "ssp585"   # paired with ssp5 RCP8.5
         )
 
-        socioeconomic_path = joinpath(@__DIR__, "..", "data", "socioeconomic", "ssp_projections_$(p.model)_$(p.ssp).csv")
-        emissions_path = joinpath(@__DIR__, "..", "data", "emissions", "rcmip_$(emissions_path_dict[Symbol(p.ssp)])_emissions_1750_to_2500.csv")
+        socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "ssp_projections_$(p.model)_$(p.ssp).csv")
+        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "rcmip_$(emissions_path_dict[Symbol(p.ssp)])_emissions_1750_to_2500.csv")
 
         # ----------------------------------------------------------------------
         # Load Data as Needed
+        println("\n-- LOAD DATA --\n")
 
         key = Symbol(p.model, "-", p.ssp)
         if !haskey(g_datasets, key)
@@ -88,24 +99,35 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         # but :time is a vector of AbstractTimesteps, each of which we can call
         # Mimi.gettime on to get the year
 
-        # TODO we could probably use broadcasting and convert t to integers first,
-        # but this seems much cleaner to treat it as it's meant to be used
-
         ## SOCIOECONOMIC -- annual 2010 to 2015 by IIASA 3-letter country code
-        for t in d.time, c in d.countries
+        # TOOD we have missing data for some countries
+        println("\n-- SETTING SOCIOECONOMIC DATA --\n")
+
+        # loop over all model timesteps (years)
+        for t in d.time
+            println("running time $(gettime(t))")
             if gettime(t) in unique(g_datasets[key][:socioeconomic].year)
 
-                v.population[t, c] = (g_datasets[key][:socioeconomic] |>
-                                @filter(_.year == gettime(t) && _.region == c) |>
-                                DataFrame).pop
-                
-                v.gdp[t, c] = (g_datasets[key][:socioeconomic] |>
-                                @filter(_.year == gettime(t) && _.region == c) |>
-                                DataFrame).pop
+                # loop over all model regions (countries)
+                for c in d.countries
+                    if c in unique(g_datasets[key][:socioeconomic].region) # only proceed if this country is in the data
+
+                        v.population[t, c] = (g_datasets[key][:socioeconomic] |>
+                                        @filter(_.year == gettime(t) && _.region == c) |>
+                                        DataFrame).pop
+                        
+                        v.gdp[t, c] = (g_datasets[key][:socioeconomic] |>
+                                        @filter(_.year == gettime(t) && _.region == c) |>
+                                        DataFrame).pop
+
+                    end
+                end
             end
         end
 
         ## EMISSIONS -- annual 1750 to 2500
+        println("\n-- SETTING EMISSIONS DATA --\n")
+
         for t in d.time
             if gettime(t) in unique(g_datasets[key][:emissions].year)
 
@@ -114,7 +136,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
                                     DataFrame).carbon_dioxide
                 v.ch4_emissions[t] = (g_datasets[key][:emissions] |>
                                     @filter(_.year == gettime(t)) |>
-                                    DataFrame).methand
+                                    DataFrame).methane
                 v.n2o_emissions[t] = (g_datasets[key][:emissions] |>
                                     @filter(_.year == gettime(t)) |>
                                     DataFrame).nitrous_oxide
