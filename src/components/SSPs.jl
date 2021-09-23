@@ -5,6 +5,8 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
     model   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, and PIK GDP_32
     ssp     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP5
+    rcp     = Parameter{String}() # can be one of RCP1.9, RCP2.6, RCP3.7, RCP4.5, or RCP8.5
+
     country_names = Parameter{String}(index=[countries]) # need the names of the countries from the dimension
 
     # TODO double check units on gases, do we want any other gases or parameters?
@@ -27,18 +29,22 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
         !(p.ssp in ssp_options) && error("SSP $(p.ssp) provided to SSPs component ssp parameter not found in available list: $(ssp_options)")
 
+        rcp_options = ["RCP1.9", "RCP2.6", "RCP3.7", "RCP4.5", "RCP8.5"]
+        !(p.rcp in rcp_options) && error("RCP $(p.rcp) provided to SSPs component rcp parameter not found in available list: $(rcp_options)")
+
         # ----------------------------------------------------------------------
         # Settings
 
-        emissions_path_dict = Dict(
-            :SSP1 => "ssp126",  # paired with ssp1 RCP 2.6
-            :SSP2 => "ssp245",  # paired with ssp2 RCP 4.5
-            :SSP3 => "ssp370",  # paired with ssp3 RCP 3.70
-            :SSP5 => "ssp585"   # paired with ssp5 RCP8.5
+        emissions_path_keys = Dict(
+            "RCP1.9" => "ssp119",  # generally paired with SSP1
+            "RCP2.6" => "ssp126",  # generally paired with SSP1
+            "RCP4.5"=> "ssp245",  # generally paired with SSP2
+            "RCP3.7" => "ssp370",  # generally paired with SSP3
+            "RCP8.5" => "ssp585"   # generally paired with SSP4
         )
 
         socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "ssp_projections_$(p.model)_$(p.ssp).csv")
-        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "rcmip_$(emissions_path_dict[Symbol(p.ssp)])_emissions_1750_to_2500.csv")
+        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "rcmip_$(emissions_path_keys[p.ssp])_emissions_1750_to_2500.csv")
 
         # ----------------------------------------------------------------------
         # Load Data as Needed

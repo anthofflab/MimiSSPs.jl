@@ -10,6 +10,7 @@ set_dimension!(m, :countries, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :model, "IIASA GDP")
 update_param!(m, :SSPs, :ssp, "SSP1")
+update_param!(m, :SSPs, :rcp, "RCP1.9")
 update_param!(m, :SSPs, :country_names, all_countries.ISO)
 
 run(m)
@@ -20,6 +21,7 @@ set_dimension!(m, :countries, all_countries.ISO[1:10])
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :model, "IIASA GDP")
 update_param!(m, :SSPs, :ssp, "SSP5")
+update_param!(m, :SSPs, :rcp, "RCP8.5")
 update_param!(m, :SSPs, :country_names, all_countries.ISO[1:10])
 
 run(m)
@@ -32,6 +34,7 @@ set_dimension!(m, :countries, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs)
 update_param!(m, :SSPs, :model, "IIASA GDP")
 update_param!(m, :SSPs, :ssp, "SSP1")
+update_param!(m, :SSPs, :rcp, "RCP1.9")
 update_param!(m, :SSPs, :country_names, all_countries.ISO)
 
 error_msg = (try eval(run(m)) catch err err end).msg
@@ -45,6 +48,7 @@ set_dimension!(m, :countries, dummy_countries)
 add_comp!(m, MimiSSPs.SSPs)
 update_param!(m, :SSPs, :model, "IIASA GDP")
 update_param!(m, :SSPs, :ssp, "SSP1")
+update_param!(m, :SSPs, :rcp, "RCP1.9")
 update_param!(m, :SSPs, :country_names, dummy_countries) # error because countries aren't in SSP set
 
 error_msg = (try eval(run(m)) catch err err end).msg
@@ -56,6 +60,7 @@ set_dimension!(m, :countries, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :model, "NOT A MODEL")
 update_param!(m, :SSPs, :ssp, "SSP1")
+update_param!(m, :SSPs, :rcp, "RCP1.9")
 update_param!(m, :SSPs, :country_names, all_countries.ISO)
 
 error_msg = (try eval(run(m)) catch err err end).msg
@@ -66,5 +71,11 @@ update_param!(m, :SSPs, :ssp, "NOT A SSP")
 
 error_msg = (try eval(run(m)) catch err err end).msg
 @test occursin("SSP NOT A SSP provided to SSPs component ssp parameter not found in available list:", error_msg)
+
+update_param!(m, :SSPs, :ssp, "SSP1")
+update_param!(m, :SSPs, :rcp, "NOT A RCP")
+
+error_msg = (try eval(run(m)) catch err err end).msg
+@test occursin("RCP NOT A RCP provided to SSPs component ssp parameter not found in available list:", error_msg)
 
 # DATA OUTPUT CHECK
