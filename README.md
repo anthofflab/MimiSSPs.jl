@@ -70,7 +70,7 @@ The available SSP models are sourced as follows:
 * IIASA GDP, OECD Env-Growth, PIK GDP_23: these models draw directly from the IIASA Database [here](https://tntcat.iiasa.ac.at/SspDb/dsd?Action=htmlpage&page=10) and proceed to post-process the data according to a procedure outlined in the Github Repository [openmodels/SSP-Extensions](https://github.com/openmodels/SSP-Extensions), cited in [Kikstra et al., 2021](http://dx.doi.org/10.1088/1748-9326/ac1d0b) and described/replicated in detail in `calibration/src/Kikstra_Rising.ipynb`
 * Benvensite: see []()
 
-The available SSP models are sourced as follows:
+The available RCP models are sourced as follows:
 
 * Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication.
 * Benvensite*: see [Benveniste et al., 2020](https://doi.org/10.1073/pnas.2007597117)
@@ -81,12 +81,12 @@ _* NOTE that this model only provides emissions for CO2, so if chosen the emissi
 
 For futher information on each of these data sources and the related data processing that produces the files the `SSPs` component draws from see the `calibration` folder
 
-SSP modes:
+SSP models:
 
 * IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra_Rising.ipynb`
-* Benvensite: NA
+* Benvensite: Benveniste et al., 2020 replication code
 
-The available SSP models are sourced as follows:
-
+RCP Models:
+ 
 * Leach: `calibration/src/Leach.ipynb`
-* Benvensite: NA
+* Benvensite: Benveniste et al., 2020 replication code
