@@ -55,11 +55,11 @@ ssp_emissions = m[:SSPs, :GDP]
 
 As shown above, the `SSPs` component imports socioeconomic data corresponding to a provided SSP model and SSP, and emissions data corresponding to RCP model and Representative Concentration Pathway (RCP).  Note that much work has been done to pair each RCP with an SSP, as described by [Carbon Brief](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) so there are customary pairings as noted below, but we leave it to the user to decide which they wish to use.
 
-* SSP option: SSP1, SSP2, SSP3, SSP4, SSP5
-* SSPmodel options: IIASA GDP, OECD Env-Growth, PIK GDP_23, and Benveniste
+* `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
+* `SSPmodel` options: IIASA GDP, OECD Env-Growth, PIK GDP_23, and Benveniste
 
-* RCP options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1), RCP3.7 (suggested pairing with SSP3), RCP4.5 (suggested pairing with SSP2), and RCP8.5 (suggested pairing with SSP5)
-* SSPmodel options: Leach, Benveniste*
+* `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1), RCP3.7 (suggested pairing with SSP3), RCP4.5 (suggested pairing with SSP2), and RCP8.5 (suggested pairing with SSP5)
+* `RCPmodel` options: Leach, Benveniste*
 
 _* NOTE that this model only provides emissions for CO2, so if chosen the emissions for CH4, SF6, and N2O will be drawn from the Leach source by default_
 

@@ -25,11 +25,14 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         # Checks
 
         ssp_model_options = ["IIASA GDP", "OECD Env-Growth", "PIK GDP_23"]
-        !(p.SSPmodel in ssp_model_options) && error("Model $(p.model) provided to SSPs component SSPmodel parameter not found in available list: $(model_options)")
+        !(p.SSPmodel in ssp_model_options) && error("Model $(p.model) provided to SSPs component SSPmodel parameter not found in available list: $(ssp_model_options)")
         
         ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
         !(p.SSP in ssp_options) && error("SSP $(p.SSP) provided to SSPs component SSP parameter not found in available list: $(ssp_options)")
-
+        
+        rcp_model_options = ["Leach", "Benveniste"]
+        !(p.RCPmodel in rcp_model_options) && error("Model $(p.model) provided to SSPs component RCPmodel parameter not found in available list: $(rcp_model_options)")
+        
         rcp_options = ["RCP1.9", "RCP2.6", "RCP3.7", "RCP4.5", "RCP8.5"]
         !(p.RCP in rcp_options) && error("RCP $(p.RCP) provided to SSPs component RCP parameter not found in available list: $(rcp_options)")
 
@@ -45,7 +48,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         )
 
         socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "$(p.SSPmodel)_$(p.SSP).csv")
-        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "rcmip_$(emissions_path_keys[p.SSP])_emissions_1750_to_2500.csv")
+        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "$(p.RCPmodel)_$(p.RCP).csv")
 
         # ----------------------------------------------------------------------
         # Load Data as Needed
