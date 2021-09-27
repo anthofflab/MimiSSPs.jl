@@ -3,10 +3,10 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
 @defcomp SSPs begin
 
-    SSPmodel   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, and PIK GDP_32
+    SSPmodel   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, PIK GDP_32, and Benveniste
     SSP     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP5
     RCPmodel   = Parameter{String}() # can be one of Leach, Benveniste
-    RCP     = Parameter{String}() # can be one of RCP1.9, RCP2.6, RCP3.7, RCP4.5, or RCP8.5
+    RCP     = Parameter{String}() # can be one of RCP1.9, RCP2.6, RCP7.0, RCP4.5, or RCP8.5
 
     country_names = Parameter{String}(index=[countries]) # need the names of the countries from the dimension
 
@@ -33,66 +33,64 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         rcp_model_options = ["Leach", "Benveniste"]
         !(p.RCPmodel in rcp_model_options) && error("Model $(p.model) provided to SSPs component RCPmodel parameter not found in available list: $(rcp_model_options)")
         
-        rcp_options = ["RCP1.9", "RCP2.6", "RCP3.7", "RCP4.5", "RCP8.5"]
+        rcp_options = ["RCP1.9", "RCP2.6", "RCP7.0", "RCP4.5", "RCP8.5"]
         !(p.RCP in rcp_options) && error("RCP $(p.RCP) provided to SSPs component RCP parameter not found in available list: $(rcp_options)")
 
         # ----------------------------------------------------------------------
         # Settings
 
-        emissions_path_keys = Dict(
-            "RCP1.9" => "ssp119",  # generally paired with SSP1
-            "RCP2.6" => "ssp126",  # generally paired with SSP1
-            "RCP4.5"=> "ssp245",  # generally paired with SSP2
-            "RCP3.7" => "ssp370",  # generally paired with SSP3
-            "RCP8.5" => "ssp585"   # generally paired with SSP5
-        )
-
         socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "$(p.SSPmodel)_$(p.SSP).csv")
         emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "$(p.RCPmodel)_$(p.RCP).csv")
-
-        # ----------------------------------------------------------------------
-        # Load Data as Needed
 
         dict_key = Symbol(p.model, "-", p.SSP)
         if !haskey(g_datasets, dict_key)
 
-            # interpolate socioeconomic data to annual
+            g_datasets[dict_key] = Dict()
 
-            socioeconomic_data = load(socioeconomic_path) |> 
-                DataFrame|> 
-                @select(:year, :region, :pop, :gdp) |>
-                DataFrame
+            # ----------------------------------------------------------------------
+            # Load Socioeconomic Data as Needed
+            #   population in billions of individuals
+            #   GDP in billions of $2005 USD
 
-            socioeconomic_data_interp = DataFrame(:year => [], :region => [], :pop => [], :gdp => [])
-            all_years = collect(minimum(socioeconomic_data.year):maximum(socioeconomic_data.year))
-            for region in unique(socioeconomic_data.region)
+            g_datasets[dict_key][:socioeconomic] = load(socioeconomic_path) |> DataFrame
 
-                region_data = socioeconomic_data |> @filter(_.region == region) |> @orderby(:year) |> DataFrame
-                pop_itp = LinearInterpolation(region_data.year, region_data.pop)
-                gdp_itp = LinearInterpolation(region_data.year, region_data.gdp)   
+            # ----------------------------------------------------------------------
+            # Load Emissions Data as Needed
+            #   carbon dioxide emissions in GtC
+            #   nitrous oxide emissions in MtN
+            #   methane emissions in MtCH4
+            #   SF6 emissions in MtSF6
+
+            # add to dictionary
+
+            if RCPmodel == "Benveniste"
                 
-                append!(socioeconomic_data_interp, DataFrame(
-                    :year => all_years,
-                    :region => fill(region, length(all_years)),
-                    :pop => pop_itp[all_years],
-                    :gdp => gdp_itp[all_years]
-                ))
-            end
-            for (i, type) in enumerate([Int64, String, Float64, Float64])
-                socioeconomic_data_interp[:,i] = convert.(type, socioeconomic_data_interp[:,i])
-            end
+                Leach_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "$(p.RCPmodel)_$(p.RCP).csv")
 
-            # add interpolated socioeconomic data, and emissions data which is already
-            # annual, to the datasets global variable
-            g_datasets[dict_key] = Dict(
-                :socioeconomic => socioeconomic_data_interp,
-                :emissions => load(emissions_path, skiplines_begin = 6)|> 
+                emissions_data = load(Leach_path, skiplines_begin = 6)|> 
                     DataFrame |> 
                     i -> rename!(i, Symbol.([:year, names(i)[2:end]...])) |> 
                     DataFrame |>
                     @select(:year, :carbon_dioxide, :nitrous_oxide, :methane, :sf6) |>
                     DataFrame
-                )
+
+                # now replace carbon dioxide with the Benveniste version
+                Benveniste_data = load(emissions_path) |> DataFrame 
+
+                emissions_data.carbon_dioxide = Benveniste_data.carbon_dioxide |> @filter(_.year in emissions_data[:year])
+                
+            elseif RCPmodel == "Leach"
+                emissions_data = load(emissions_path, skiplines_begin = 6)|> 
+                        DataFrame |> 
+                        i -> rename!(i, Symbol.([:year, names(i)[2:end]...])) |> 
+                        DataFrame |>
+                        @select(:year, :carbon_dioxide, :nitrous_oxide, :methane, :sf6) |>
+                        DataFrame
+            else # already perfect formatted
+                emissions_data = load(emissions_path)|> DataFrame
+            end
+
+            g_datasets[dict_key][:emissions] = emissions_data
         end
 
         # ----------------------------------------------------------------------

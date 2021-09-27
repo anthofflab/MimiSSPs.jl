@@ -58,7 +58,7 @@ As shown above, the `SSPs` component imports socioeconomic data corresponding to
 * `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
 * `SSPmodel` options: IIASA GDP, OECD Env-Growth, PIK GDP_23, and Benveniste
 
-* `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1), RCP3.7 (suggested pairing with SSP3), RCP4.5 (suggested pairing with SSP2), and RCP8.5 (suggested pairing with SSP5)
+* `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1),  RCP4.5 (suggested pairing with SSP2), RCP6.0 (suggested pairing with SSP4), RCP7.0 (suggested pairing with SSP3), and RCP8.5 (suggested pairing with SSP5)
 * `RCPmodel` options: Leach, Benveniste*
 
 _* NOTE that this model only provides emissions for CO2, so if chosen the emissions for CH4, SF6, and N2O will be drawn from the Leach source by default_
@@ -83,10 +83,10 @@ For futher information on each of these data sources and the related data proces
 
 SSP models:
 
-* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra_Rising.ipynb`
-* Benvensite: Benveniste et al., 2020 replication code
+* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra-Rising_Calibration.ipynb` and Kikstra et al. 2021 replication code
+* Benvensite: `calibration/Benveniste/Benveniste_Calibration.ipynb` and Benveniste et al., 2020 replication code
 
 RCP Models:
  
-* Leach: `calibration/src/Leach.ipynb`
-* Benvensite: Benveniste et al., 2020 replication code
+* Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code
+* Benvensite: `calibration/Benveniste/Benveniste_Calibration.ipynb` and Benveniste et al., 2020 replication code
