@@ -1,5 +1,7 @@
 # MimiSSPs.jl 
 
+**The manifest for this project indicates using the Mimi#master branch, we advise doing so as it leverages recent advances in the Mimi project.**
+
 This repository holds a component using the [Mimi](https://www.mimiframework.org) framework which provides [Shared Socioeconomic Pathways](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) parameters, including socioeconomic (population and GDP) and emissions (CO2, CH4, CH4, and SF6), to be connected with as desired with other Mimi components and run in Mimi models. More specifically, the model takes data inputs derived from the SSPs but necessarily with an annual timestep and at the country spatial resolution for socioeconomic variables and global spatial resolution for emissions.
 
 ## Preparing the Software Environment
@@ -17,7 +19,7 @@ pkg> add Mimi
 
 The model uses the Mimi framework and it is highly recommended to read the Mimi documentation first to understand the code structure. This model presents two components, which will most often be used in tandem. The basic way to access the MimiSSPs components, both `SSPs` and `RegionAggregatorSum` and explore the results is the following:
 
-```
+```julia
 using Mimi 
 using MimiSSPs
 
@@ -55,7 +57,7 @@ Now say you want to connect the `m[:SSPs, :population]` output variable to anoth
 
 Once again this component **still needs to be streamlined for ease of use**, but the following will work.
 
-```
+```julia
 # Start with the model `m` from above and add the component with the name `:PopulationAggregator`
 add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator, first = 2010, last = 2300)
 
