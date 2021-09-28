@@ -57,26 +57,25 @@ Once again this component **still needs to be streamlined for ease of use**, but
 
 ```
 # Start with the model `m` from above and add the component with the name `:PopulationAggregator`
-add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator)
+add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator, first = 2010, last = 2300)
 
 # Bring in a dummy mapping between the countries list from the model above and our current one. Note that this DataFrame has two columns, `InputRegion` and `OutputRegion`, where `InputRegion` is identical to `all_countries.ISO` above but we will reset here for clarity.
 
 mapping = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
 
-input-regions = mapping.Input_Region
-output-regions = sort(unique(mapping.Output_Region))
+inputregions = mapping.Input_Region
+outputregions = sort(unique(mapping.Output_Region))
 
 # set the dimensions
-set_dimension!(m, :input-regions, input-regions)
-set_dimension!(m, :output-regions, output-regions)
+set_dimension!(m, :inputregions, inputregions)
+set_dimension!(m, :outputregions, outputregions)
 
 # provide the mapping, and the names of the input regions and output regions, which should just take copies of what you provided to `set_dimension!` above
-update_param!(m, :PopulationAggregator, :input_region_names, input-regions)
-update_param!(m, :PopulationAggregator, :output_region_names, output-regions)
+update_param!(m, :PopulationAggregator, :input_region_names, inputregions)
+update_param!(m, :PopulationAggregator, :output_region_names, outputregions)
 update_param!(m, :PopulationAggregator, :input_output_mapping, Matrix(mapping))
 
-backup_pop = zeros(length(1750:2300), length(input-regions)) # we need some backup data, which we'll make zeros here
-connect_param!(m, :PopulationAggregator, :input, :SSPs, :population, backup_pop, ignoreunits=true)
+connect_param!(m, :PopulationAggregator, :input, :SSPs, :population, ignoreunits=true)
 
 run(m)
 
