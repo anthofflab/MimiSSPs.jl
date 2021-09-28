@@ -6,7 +6,8 @@ using Mimi
     outputregions = Index()
 
     # first column has input name and second column has mapped output name
-    input_output_mapping = Parameter{String}(index=[inputregions, 2])
+    input_output_mapping = Parameter{String}(index=[inputregions])
+    input_output_mapping_int = Variable{Int}(index=[inputregions])
 
     input_region_names = Parameter{Vector{String}}(index=inputregions)
     output_region_names = Parameter{Vector{String}}(index=outputregions)
@@ -14,10 +15,17 @@ using Mimi
     input = Parameter(index=[time, inputregions])
     output = Variable(index=[time, outputregions])
 
+    function init(p,v,d)
+        for i in d.input_regions
+            v.input_output_mapping_int[i] = findfirst(p.input_output_mapping[i], p.input_region_names)
+        end
+    end
+
     function run_timestep(p,v,d,t)
-        for output_region in d.outputregions
-            idxs = findall(i -> i ==  p.output_region_names[output_region], p.input_output_mapping[:,2])
-            v.output[t, output_region] = sum(p.input[t, idxs])
+        v.output[t, :] .= 0.
+
+        for i in d.inputregions
+            v.output[t, v.input_output_mapping_int[i]] += p.input[t,i]
         end
     end
 end
