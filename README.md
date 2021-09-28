@@ -28,7 +28,7 @@ m = Model()
 
 set_dimension!(m, :time, 1750:2300)
 
-all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
+all_countries = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
 set_dimension!(m, :countries, all_countries.ISO)
 
 # Add the SSPs component as imported from `MimiSSPs`
@@ -37,7 +37,7 @@ add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 # Set parameters for `SSPmodel`, `SSP`, and `RCP` (Strings for inputs) as well as the country names, which should be a copy of what was used ot set the `countries` dimension
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP1")
-update_param!(m, :SSPs, :SSPmodel, "Leach")
+update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
 update_param!(m, :SSPs, :country_names, all_countries.ISO)
 
@@ -48,7 +48,41 @@ run(m)
 explore(m)
 
 # Access a specific variable
-ssp_emissions = m[:SSPs, :GDP]
+ssp_emissions = m[:SSPs, :gdp]
+```
+
+Now say you want to connect the `m[:SSPs, :population]` output variable to another Mimi component that requires population at a regional level.  This is where the `RegionAggregatorSum` component can be helpful, which, as the name indicates, aggregates countries to regions with a provided mapping via the `sum` function (other functions can be added as desired, this is a relatively new and nimble component).  You will need to provide a mapping between the input regions (countries here) and output regions (regions here) in a 2 column Array.
+
+Once again this component **still needs to be streamlined for ease of use**, but the following will work.
+
+```
+# Start with the model `m` from above and add the component with the name `:PopulationAggregator`
+add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator)
+
+# Bring in a dummy mapping between the countries list from the model above and our current one. Note that this DataFrame has two columns, `InputRegion` and `OutputRegion`, where `InputRegion` is identical to `all_countries.ISO` above but we will reset here for clarity.
+
+mapping = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
+
+input-regions = mapping.Input_Region
+output-regions = sort(unique(mapping.Output_Region))
+
+# set the dimensions
+set_dimension!(m, :input-regions, input-regions)
+set_dimension!(m, :output-regions, output-regions)
+
+# provide the mapping, and the names of the input regions and output regions, which should just take copies of what you provided to `set_dimension!` above
+update_param!(m, :PopulationAggregator, :input_region_names, input-regions)
+update_param!(m, :PopulationAggregator, :output_region_names, output-regions)
+update_param!(m, :PopulationAggregator, :input_output_mapping, Matrix(mapping))
+
+backup_pop = zeros(length(1750:2300), length(input-regions)) # we need some backup data, which we'll make zeros here
+connect_param!(m, :PopulationAggregator, :input, :SSPs, :population, backup_pop, ignoreunits=true)
+
+run(m)
+
+# View the aggregated population variable, aggregated from 171 countries to 11 regions
+getdataframe(m, :PopulationAggregator, :output)
+
 ```
 
 ## Data and Calibration
@@ -58,10 +92,8 @@ As shown above, the `SSPs` component imports socioeconomic data corresponding to
 * `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
 * `SSPmodel` options: IIASA GDP, OECD Env-Growth, PIK GDP_23, and Benveniste
 
-* `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1),  RCP4.5 (suggested pairing with SSP2), RCP6.0 (suggested pairing with SSP4), RCP7.0 (suggested pairing with SSP3), and RCP8.5 (suggested pairing with SSP5)
-* `RCPmodel` options: Leach, Benveniste*
-
-_* NOTE that this model only provides emissions for CO2, so if chosen the emissions for CH4, SF6, and N2O will be drawn from the Leach source by default_
+* `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1),  RCP4.5 (suggested pairing with SSP2), RCP7.0 (suggested pairing with SSP3), and RCP8.5 (suggested pairing with SSP5)
+* `RCPmodel` options: Leach
 
 ### Data Sources
 
@@ -73,9 +105,6 @@ The available SSP models are sourced as follows:
 The available RCP models are sourced as follows:
 
 * Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication.
-* Benvensite*: see [Benveniste et al., 2020](https://doi.org/10.1073/pnas.2007597117)
-
-_* NOTE that this model only provides emissions for CO2, so if chosen the emissions for CH4, SF6, and N2O will be drawn from the Leach source by default_
 
 ### Calibration and Data Processing
 
@@ -89,4 +118,7 @@ SSP models:
 RCP Models:
  
 * Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code
-* Benvensite: `calibration/Benveniste/Benveniste_Calibration.ipynb` and Benveniste et al., 2020 replication code
+
+## News/Upcoming
+
+* We have carbon dioxide emissions from Benveniste et al., 2020 availble soon, although these run 1950 to 3000 and are only available for the one gas (not CH4, N2O, and SF6) so we have not yet determined how to properly incorprate them

@@ -82,6 +82,118 @@ update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCP, "NOT A RCP")
 
 error_msg = (try eval(run(m)) catch err err end).msg
-@test occursin("RCP NOT A RCP provided to SSPs component SSP parameter not found in available list:", error_msg)
+@test occursin("RCP NOT A RCP provided to SSPs component RCP parameter not found in available list:", error_msg)
 
-# DATA OUTPUT CHECK
+# VALIDATION
+
+# Leach and Benveniste
+
+RCPmodel = "Leach"
+RCP = "RCP4.5"
+SSPmodel = "Benveniste"
+SSP = "SSP2"
+
+m = Model()
+set_dimension!(m, :time, 1750:2300)
+set_dimension!(m, :countries, all_countries.ISO)
+add_comp!(m, MimiSSPs.SSPs, first = 1950, last = 2300)
+update_param!(m, :SSPs, :SSPmodel, SSPmodel)
+update_param!(m, :SSPs, :SSP, SSP)
+update_param!(m, :SSPs, :RCPmodel, RCPmodel)
+update_param!(m, :SSPs, :RCP, RCP)
+update_param!(m, :SSPs, :country_names, all_countries.ISO)
+
+run(m)
+
+emissions_path = joinpath(@__DIR__, "..", "data", "emissions", "$(RCPmodel)_$(RCP).csv")
+emissions_data = load(emissions_path, skiplines_begin = 6)|> 
+    DataFrame |> 
+    i -> rename!(i, Symbol.([:year, names(i)[2:end]...])) |> 
+    DataFrame |>
+    @select(:year, :carbon_dioxide, :nitrous_oxide, :methane, :sf6) |>
+    DataFrame |>
+    @filter(_.year in 1950:2300) |>
+    DataFrame
+
+@test m[:SSPs, :co2_emissions][findfirst(i -> i == 1950, collect(1750:2300)):end] ≈ emissions_data.carbon_dioxide  atol = 1e-9
+@test m[:SSPs, :ch4_emissions][findfirst(i -> i == 1950, collect(1750:2300)):end] ≈ emissions_data.methane  atol = 1e-9
+@test m[:SSPs, :sf6_emissions][findfirst(i -> i == 1950, collect(1750:2300)):end] ≈ emissions_data.sf6  atol = 1e-9
+@test m[:SSPs, :n2o_emissions][findfirst(i -> i == 1950, collect(1750:2300)):end] ≈ emissions_data.nitrous_oxide atol = 1e-9
+
+socioeconomic_path = joinpath(@__DIR__, "..", "data", "socioeconomic", "$(SSPmodel)_$(SSP).csv")
+socioeconomic_data = load(socioeconomic_path) |> DataFrame
+
+for country in all_countries.ISO
+
+    pop_data_model = getdataframe(m, :SSPs, :population) |>
+        @filter(_.time in collect(1950:2300) && _.countries == country) |>
+        DataFrame |>
+        @orderby(:time) |>
+        DataFrame
+
+    gdp_data_model = getdataframe(m, :SSPs, :gdp) |>
+        @filter(_.time in collect(1950:2300) && _.countries == country) |>
+        DataFrame |>
+        @orderby(:time) |>
+        DataFrame
+
+    socioeconomic_data_country = socioeconomic_data |>
+        @filter(_.year in collect(1950:2300) && _.country == country) |>
+        DataFrame |>
+        @orderby(:year) |>
+        DataFrame
+
+    @test pop_data_model.population  ≈ socioeconomic_data_country.pop  atol = 1e-9
+    @test gdp_data_model.gdp  ≈ socioeconomic_data_country.gdp  atol = 1e-9
+end
+
+# IIASA GDP
+
+SSPmodel = "IIASA GDP"
+update_param!(m, :SSPs, :SSPmodel, SSPmodel)
+@test_throws ErrorException run(m) # can't run starting in 1950
+
+Mimi.set_first_last!(m, :SSPs, first = 2010)
+run(m)
+
+emissions_path = joinpath(@__DIR__, "..", "data", "emissions", "$(RCPmodel)_$(RCP).csv")
+emissions_data = load(emissions_path, skiplines_begin = 6)|> 
+    DataFrame |> 
+    i -> rename!(i, Symbol.([:year, names(i)[2:end]...])) |> 
+    DataFrame |>
+    @select(:year, :carbon_dioxide, :nitrous_oxide, :methane, :sf6) |>
+    DataFrame |>
+    @filter(_.year in 2010:2300) |>
+    DataFrame
+
+@test m[:SSPs, :co2_emissions][findfirst(i -> i == 2010, collect(1750:2300)):end] ≈ emissions_data.carbon_dioxide  atol = 1e-9
+@test m[:SSPs, :ch4_emissions][findfirst(i -> i == 2010, collect(1750:2300)):end] ≈ emissions_data.methane  atol = 1e-9
+@test m[:SSPs, :sf6_emissions][findfirst(i -> i == 2010, collect(1750:2300)):end] ≈ emissions_data.sf6  atol = 1e-9
+@test m[:SSPs, :n2o_emissions][findfirst(i -> i == 2010, collect(1750:2300)):end] ≈ emissions_data.nitrous_oxide atol = 1e-9
+
+socioeconomic_path = joinpath(@__DIR__, "..", "data", "socioeconomic", "$(SSPmodel)_$(SSP).csv")
+socioeconomic_data = load(socioeconomic_path) |> DataFrame
+
+for country in all_countries.ISO
+
+    pop_data_model = getdataframe(m, :SSPs, :population) |>
+        @filter(_.time in collect(2010:2300) && _.countries == country) |>
+        DataFrame |>
+        @orderby(:time) |>
+        DataFrame
+
+    gdp_data_model = getdataframe(m, :SSPs, :gdp) |>
+        @filter(_.time in collect(2010:2300) && _.countries == country) |>
+        DataFrame |>
+        @orderby(:time) |>
+        DataFrame
+
+    socioeconomic_data_country = socioeconomic_data |>
+        @filter(_.year in collect(2010:2300) && _.country == country) |>
+        DataFrame |>
+        @orderby(:year) |>
+        DataFrame
+
+    @test pop_data_model.population  ≈ socioeconomic_data_country.pop  atol = 1e-9
+    @test gdp_data_model.gdp  ≈ socioeconomic_data_country.gdp  atol = 1e-9
+end
