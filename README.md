@@ -1,6 +1,6 @@
 # MimiSSPs.jl 
 
-This repository holds a component using the [Mimi](https://www.mimiframework.org) framework which provides [Shared Socioeconomic Pathways](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) parameters, including socioeconomic (population and GDP) and emissions (CO2, CH4, CH4, and SF6), to be connected with as desired with other Mimi components and run in Mimi models. More specifically, the model takes data inputs derived from the SSPs but necessarily with an annual timestep from XX through XX and at the country spatial resolution for socioeconomic variables and global spatial resolution for emissions.
+This repository holds a component using the [Mimi](https://www.mimiframework.org) framework which provides [Shared Socioeconomic Pathways](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) parameters, including socioeconomic (population and GDP) and emissions (CO2, CH4, CH4, and SF6), to be connected with as desired with other Mimi components and run in Mimi models. More specifically, the model takes data inputs derived from the SSPs but necessarily with an annual timestep and at the country spatial resolution for socioeconomic variables and global spatial resolution for emissions.
 
 ## Preparing the Software Environment
 
@@ -24,22 +24,22 @@ using MimiSSPs
 # Create the a model
 m = Model()
 
-# Set dimensions, including time and the countries you wish to pull SSP data for, noting that you must provide a subset of the three-digit ISO country codes you can find here: `data/keys/MimiSSPs_ISO.csv`.  In this case we will use all of them for illustrative purposes.
-
+# Set the time dimension for the whole model, which can run longer than an individual component if desired
 set_dimension!(m, :time, 1750:2300)
-
-all_countries = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
-set_dimension!(m, :countries, all_countries.ISO)
 
 # Add the SSPs component as imported from `MimiSSPs`
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
+
+# Set country dimension and related parameter: this should indicate all the countries you wish to pull SSP data for, noting that you must provide a subset of the three-digit ISO country codes you can find here: `data/keys/MimiSSPs_ISO.csv`.  In this case we will use all of them for illustrative purposes.
+all_countries = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
+set_dimension!(m, :countries, all_countries.ISO)
+update_param!(m, :SSPs, :country_names, all_countries.ISO) # should match the dimension
 
 # Set parameters for `SSPmodel`, `SSP`, and `RCP` (Strings for inputs) as well as the country names, which should be a copy of what was used ot set the `countries` dimension
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
-update_param!(m, :SSPs, :country_names, all_countries.ISO)
 
 # Run the model
 run(m)
@@ -60,22 +60,21 @@ Once again this component **still needs to be streamlined for ease of use**, but
 add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator, first = 2010, last = 2300)
 
 # Bring in a dummy mapping between the countries list from the model above and our current one. Note that this DataFrame has two columns, `InputRegion` and `OutputRegion`, where `InputRegion` is identical to `all_countries.ISO` above but we will reset here for clarity.
-
 mapping = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
-
 inputregions = mapping.Input_Region
 outputregions = sort(unique(mapping.Output_Region))
 
-# set the dimensions
+# Set the region dimensions
 set_dimension!(m, :inputregions, inputregions)
 set_dimension!(m, :outputregions, outputregions)
 
-# provide the mapping, and the names of the input regions and output regions, which should just take copies of what you provided to `set_dimension!` above
+# Provide the mapping parameter as well as the the names of the input regions and output regions, which should just take copies of what you provided to `set_dimension!` above
 update_param!(m, :PopulationAggregator, :input_region_names, inputregions)
 update_param!(m, :PopulationAggregator, :output_region_names, outputregions)
-update_param!(m, :PopulationAggregator, :input_output_mapping, Matrix(mapping))
+update_param!(m, :PopulationAggregator, :input_output_mapping, Matrix(mapping)) # Array with two columns, input regions in column 1 and corresponding many-to-one mapping to output regions in column 2
 
-connect_param!(m, :PopulationAggregator, :input, :SSPs, :population, ignoreunits=true)
+# Make SSPs component `:population` variable the feed into the `:input` variable of the `PopulationAggregator` component
+connect_param!(m, :PopulationAggregator, :input, :SSPs, :population)
 
 run(m)
 
