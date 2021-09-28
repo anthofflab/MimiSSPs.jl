@@ -16,10 +16,10 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
     population      = Variable(index=[time, countries], unit="million")
     gdp             = Variable(index=[time, countries], unit="billion US\$2005/yr")
 
-    co2_emissions   = Variable(index=[time], unit="GtC")
-    ch4_emissions   = Variable(index=[time], unit="MtCH4")
-    n2o_emissions   = Variable(index=[time], unit="MtN")
-    sf6_emissions   = Variable(index=[time], unit="MtSF6")
+    co2_emissions   = Variable(index=[time], unit="GtC/yr")
+    ch4_emissions   = Variable(index=[time], unit="MtCH4/yr")
+    n2o_emissions   = Variable(index=[time], unit="MtN/yr")
+    sf6_emissions   = Variable(index=[time], unit="MtSF6/yr")
 
     function init(p,v,d)
 
