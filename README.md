@@ -51,9 +51,7 @@ explore(m)
 ssp_emissions = m[:SSPs, :gdp]
 ```
 
-Now say you want to connect the `m[:SSPs, :population]` output variable to another Mimi component that requires population at a regional level.  This is where the `RegionAggregatorSum` component can be helpful, which, as the name indicates, aggregates countries to regions with a provided mapping via the `sum` function (other functions can be added as desired, this is a relatively new and nimble component).  You will need to provide a mapping between the input regions (countries here) and output regions (regions here) in a 2 column Array.
-
-Once again this component **still needs to be streamlined for ease of use**, but the following will work.
+Now say you want to connect the `m[:SSPs, :population]` output variable to another Mimi component that requires population at a regional level.  This is where the `RegionAggregatorSum` component can be helpful, which, as the name indicates, aggregates countries to regions with a provided mapping via the `sum` function (other functions can be added as desired, this is a relatively new and nimble component).  You will need to provide a mapping between the input regions (countries here) and output regions (regions here) in a Vector of the length of the input regions and each element being one of the output regions.
 
 ```julia
 # Start with the model `m` from above and add the component with the name `:PopulationAggregator`
