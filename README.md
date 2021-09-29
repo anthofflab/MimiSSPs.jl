@@ -71,7 +71,7 @@ set_dimension!(m, :outputregions, outputregions)
 # Provide the mapping parameter as well as the the names of the input regions and output regions, which should just take copies of what you provided to `set_dimension!` above
 update_param!(m, :PopulationAggregator, :input_region_names, inputregions)
 update_param!(m, :PopulationAggregator, :output_region_names, outputregions)
-update_param!(m, :PopulationAggregator, :input_output_mapping, Matrix(mapping)) # Array with two columns, input regions in column 1 and corresponding many-to-one mapping to output regions in column 2
+update_param!(m, :PopulationAggregator, :input_output_mapping, mapping.Output_Region) # Vector with length of input regions, each element matching an output region in the output_region_names parameter (and outputregions dimension)
 
 # Make SSPs component `:population` variable the feed into the `:input` variable of the `PopulationAggregator` component
 connect_param!(m, :PopulationAggregator, :input, :SSPs, :population)

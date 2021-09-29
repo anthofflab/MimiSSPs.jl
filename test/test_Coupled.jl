@@ -26,8 +26,15 @@ set_dimension!(m, :outputregions, outputregions)
 
 update_param!(m, :RegionAggregatorSum, :input_region_names, inputregions)
 update_param!(m, :RegionAggregatorSum, :output_region_names, outputregions)
-update_param!(m, :RegionAggregatorSum, :input_output_mapping, Matrix(dummy_input_output))
+update_param!(m, :RegionAggregatorSum, :input_output_mapping, dummy_input_output.Output_Region)
 
-connect_param!(m, :RegionAggregatorSum, :input, :SSPs, :population, ignoreunits=true)
+connect_param!(m, :RegionAggregatorSum, :input, :SSPs, :population)
+
+run(m)
+
+# Should also work if Aggregator runs long, using backup data
+Mimi.set_first_last!(m, :RegionAggregatorSum, first = 1750)
+backup = zeros(551, 171)
+connect_param!(m, :RegionAggregatorSum, :input, :SSPs, :population, backup, ignoreunits=true)
 
 run(m)
