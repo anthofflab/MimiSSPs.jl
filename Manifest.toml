@@ -432,9 +432,9 @@ version = "0.6.8"
 
 [[Mimi]]
 deps = ["CSVFiles", "Classes", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "Electron", "FileIO", "FilePaths", "GlobalSensitivityAnalysis", "GraphPlot", "IterTools", "IteratorInterfaceExtensions", "JSON", "LightGraphs", "LinearAlgebra", "Logging", "MacroTools", "MetaGraphs", "NamedArrays", "Pkg", "ProgressMeter", "Random", "Serialization", "Statistics", "StatsBase", "StringBuilders", "TableTraits", "VegaLite"]
-git-tree-sha1 = "e492d4dddad756e4508a8dcb08f7e5c5aee780d4"
+git-tree-sha1 = "c57606dc157943ab3b74dd5c4f28a3c3cd57fb96"
 uuid = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
-version = "1.3.1"
+version = "1.3.2"
 
 [[Missings]]
 deps = ["DataAPI"]
@@ -693,9 +693,9 @@ version = "0.33.10"
 
 [[StatsFuns]]
 deps = ["ChainRulesCore", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "46d7ccc7104860c38b11966dd1f72ff042f382e4"
+git-tree-sha1 = "d9bcf8d82077567abc2d972dd2db4b201a7d4263"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "0.9.10"
+version = "0.9.11"
 
 [[StringBuilders]]
 git-tree-sha1 = "f790e18a532e410a985eb99db8dfd26cbffd771b"

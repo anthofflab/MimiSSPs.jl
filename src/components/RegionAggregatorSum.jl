@@ -5,8 +5,8 @@ using Mimi
     inputregions = Index()
     outputregions = Index()
 
-    # first column has input name and second column has mapped output name
-    input_output_mapping = Parameter{String}(index=[inputregions, 2])
+    input_output_mapping = Parameter{String}(index=[inputregions]) # one element per input region containing it's corresponding output region
+    input_output_mapping_int = Variable{Int}(index=[inputregions]) # internally computed for speed up
 
     input_region_names = Parameter{Vector{String}}(index=inputregions)
     output_region_names = Parameter{Vector{String}}(index=outputregions)
@@ -14,10 +14,17 @@ using Mimi
     input = Parameter(index=[time, inputregions])
     output = Variable(index=[time, outputregions])
 
+    function init(p,v,d)
+        idxs = indexin(p.input_output_mapping, p.output_region_names)
+        !isnothing(findfirst(i -> isnothing(i), idxs)) ? error("All provided region names in the RegionAggregatorSum's input_output_mapping Parameter must exist in the output_region_names Parameter.") : nothing
+        v.input_output_mapping_int[:] = idxs
+    end
+
     function run_timestep(p,v,d,t)
-        for output_region in d.outputregions
-            idxs = findall(i -> i ==  p.output_region_names[output_region], p.input_output_mapping[:,2])
-            v.output[t, output_region] = sum(p.input[t, idxs])
+        v.output[t, :] .= 0.
+
+        for i in d.inputregions
+            v.output[t, v.input_output_mapping_int[i]] += p.input[t,i]
         end
     end
 end
