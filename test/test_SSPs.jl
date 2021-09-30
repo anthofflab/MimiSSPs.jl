@@ -7,7 +7,7 @@ all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "MimiSSPs_ISO.csv"
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP1")
@@ -19,7 +19,7 @@ run(m)
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, all_countries.ISO[1:10])
+set_dimension!(m, :country, all_countries.ISO[1:10])
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP5")
@@ -33,7 +33,7 @@ run(m)
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs)
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP1")
@@ -48,7 +48,7 @@ dummy_countries = ["Sun", "Rain", "Cloud"]
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, dummy_countries)
+set_dimension!(m, :country, dummy_countries)
 add_comp!(m, MimiSSPs.SSPs)
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
 update_param!(m, :SSPs, :SSP, "SSP1")
@@ -61,7 +61,7 @@ error_msg = (try eval(run(m)) catch err err end).msg
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, "NOT A MODEL")
 update_param!(m, :SSPs, :SSP, "SSP1")
@@ -95,7 +95,7 @@ SSP = "SSP2"
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :countries, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO)
 add_comp!(m, MimiSSPs.SSPs, first = 1950, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, SSPmodel)
 update_param!(m, :SSPs, :SSP, SSP)

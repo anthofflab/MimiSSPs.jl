@@ -10,7 +10,7 @@ set_dimension!(m, :time, 1750:2300)
 
 # Handle the MimiSSPs.SSPs component
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
-set_dimension!(m, :countries, inputregions)
+set_dimension!(m, :country, inputregions)
 update_param!(m, :SSPs, :country_names, inputregions)
 
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")

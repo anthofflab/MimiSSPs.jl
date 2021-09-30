@@ -32,7 +32,7 @@ add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 
 # Set country dimension and related parameter: this should indicate all the countries you wish to pull SSP data for, noting that you must provide a subset of the three-digit ISO country codes you can find here: `data/keys/MimiSSPs_ISO.csv`.  In this case we will use all of them for illustrative purposes.
 all_countries = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
-set_dimension!(m, :countries, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO)
 update_param!(m, :SSPs, :country_names, all_countries.ISO) # should match the dimension
 
 # Set parameters for `SSPmodel`, `SSP`, and `RCP` (Strings for inputs) as well as the country names, which should be a copy of what was used ot set the `countries` dimension
