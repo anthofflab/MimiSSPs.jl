@@ -3,18 +3,18 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
 @defcomp SSPs begin
 
-    countries = Index()
+    country = Index()
 
     SSPmodel   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, PIK GDP_32, and Benveniste
     SSP     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP4, SSP5
     RCPmodel   = Parameter{String}() # can be one of Leach
     RCP     = Parameter{String}() # can be one of RCP1.9, RCP2.6, RCP4.5, RCP7.0, or RCP8.5
 
-    country_names = Parameter{String}(index=[countries]) # need the names of the countries from the dimension
+    country_names = Parameter{String}(index=[country]) # need the names of the countries from the dimension
 
     # TODO double check units on gases, do we want any other gases or parameters?
-    population      = Variable(index=[time, countries], unit="million")
-    gdp             = Variable(index=[time, countries], unit="billion US\$2005/yr")
+    population      = Variable(index=[time, country], unit="million")
+    gdp             = Variable(index=[time, country], unit="billion US\$2005/yr")
 
     co2_emissions   = Variable(index=[time], unit="GtC/yr")
     ch4_emissions   = Variable(index=[time], unit="MtCH4/yr")

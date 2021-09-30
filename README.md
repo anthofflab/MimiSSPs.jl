@@ -30,10 +30,10 @@ set_dimension!(m, :time, 1750:2300)
 # Add the SSPs component as imported from `MimiSSPs`
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 
-# Set country dimension and related parameter: this should indicate all the countries you wish to pull SSP data for, noting that you must provide a subset of the three-digit ISO country codes you can find here: `data/keys/MimiSSPs_ISO.csv`.  In this case we will use all of them for illustrative purposes.
-all_countries = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
-set_dimension!(m, :country, all_countries.ISO)
-update_param!(m, :SSPs, :country_names, all_countries.ISO) # should match the dimension
+# Set country dimension and related parameter: this should indicate all the countries you wish to pull SSP data for, noting that you must provide a subset of the three-digit ISO country codes you can find here: `data/keys` with one file per model labeled <model>_ISO3.csv.  In this case we will use all of them for illustrative purposes.
+all_countries = load(joinpath(@__DIR__, "data", "keys", "OECD Env-Growth_ISO3.csv")) |> DataFrame
+set_dimension!(m, :country, all_countries.ISO3)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3) # should match the dimension
 
 # Set parameters for `SSPmodel`, `SSP`, and `RCP` (Strings for inputs) as well as the country names, which should be a copy of what was used ot set the `countries` dimension
 update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
@@ -57,8 +57,8 @@ Now say you want to connect the `m[:SSPs, :population]` output variable to anoth
 # Start with the model `m` from above and add the component with the name `:PopulationAggregator`
 add_comp!(m, MimiSSPs.RegionAggregatorSum, :PopulationAggregator, first = 2010, last = 2300)
 
-# Bring in a dummy mapping between the countries list from the model above and our current one. Note that this DataFrame has two columns, `InputRegion` and `OutputRegion`, where `InputRegion` is identical to `all_countries.ISO` above but we will reset here for clarity.
-mapping = load(joinpath(@__DIR__, "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
+# Bring in a dummy mapping between the countries list from the model above and our current one. Note that this DataFrame has two columns, `InputRegion` and `OutputRegion`, where `InputRegion` is identical to `all_countries.ISO3` above but we will reset here for clarity.
+mapping = load(joinpath(@__DIR__, "data", "keys", "OECD Env-Growth_dummyInputOutput.csv")) |> DataFrame
 inputregions = mapping.Input_Region
 outputregions = sort(unique(mapping.Output_Region))
 

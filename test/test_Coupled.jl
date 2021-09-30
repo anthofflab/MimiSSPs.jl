@@ -1,6 +1,6 @@
 using Mimi, MimiSSPs, DataFrames, CSVFiles, Query, Test
 
-dummy_input_output = load(joinpath(@__DIR__, "..", "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
+dummy_input_output = load(joinpath(@__DIR__, "..", "data", "keys", "OECD Env-Growth_dummyInputOutput.csv")) |> DataFrame
 
 inputregions = dummy_input_output.Input_Region
 outputregions = sort(unique(dummy_input_output.Output_Region))
@@ -13,7 +13,7 @@ add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 set_dimension!(m, :country, inputregions)
 update_param!(m, :SSPs, :country_names, inputregions)
 
-update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
+update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
@@ -34,7 +34,7 @@ run(m)
 
 # Should also work if Aggregator runs long, using backup data
 Mimi.set_first_last!(m, :RegionAggregatorSum, first = 1750)
-backup = zeros(551, 171)
+backup = zeros(551, 184)
 connect_param!(m, :RegionAggregatorSum, :input, :SSPs, :population, backup, ignoreunits=true)
 
 run(m)

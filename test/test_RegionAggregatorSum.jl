@@ -1,6 +1,6 @@
 using Mimi, MimiSSPs, DataFrames, CSVFiles, Query, Test
 
-dummy_input_output = load(joinpath(@__DIR__, "..", "data", "keys", "MimiSSPs_dummyInputOutput.csv")) |> DataFrame
+dummy_input_output = load(joinpath(@__DIR__, "..", "data", "keys", "OECD Env-Growth_dummyInputOutput.csv")) |> DataFrame
 
 inputregions = dummy_input_output.Input_Region
 outputregions = sort(unique(dummy_input_output.Output_Region))

@@ -1,31 +1,31 @@
-using Mimi, MimiSSPs, DataFrames, CSVFiles, Query, Test
+using Mimi, MimiSSPs, DataFrames, CSVFiles, Query, Test, Missings
 import MimiSSPs: SSPs
-
-all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "MimiSSPs_ISO.csv")) |> DataFrame
 
 # BASIC API
 
+all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "OECD Env-Growth_ISO3.csv")) |> DataFrame
+
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :country, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO3)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
-update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
+update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
-update_param!(m, :SSPs, :country_names, all_countries.ISO)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
 
 run(m)
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :country, all_countries.ISO[1:10])
+set_dimension!(m, :country, all_countries.ISO3[1:10])
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
-update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
+update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP5")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP8.5")
-update_param!(m, :SSPs, :country_names, all_countries.ISO[1:10])
+update_param!(m, :SSPs, :country_names, all_countries.ISO3[1:10])
 
 run(m)
 
@@ -33,13 +33,13 @@ run(m)
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :country, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO3)
 add_comp!(m, MimiSSPs.SSPs)
-update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
+update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
-update_param!(m, :SSPs, :country_names, all_countries.ISO)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
 
 error_msg = (try eval(run(m)) catch err err end).msg
 @test occursin("Cannot run SSP component in year 1750", error_msg)
@@ -50,7 +50,7 @@ m = Model()
 set_dimension!(m, :time, 1750:2300)
 set_dimension!(m, :country, dummy_countries)
 add_comp!(m, MimiSSPs.SSPs)
-update_param!(m, :SSPs, :SSPmodel, "IIASA GDP")
+update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
@@ -61,13 +61,13 @@ error_msg = (try eval(run(m)) catch err err end).msg
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :country, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO3)
 add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, "NOT A MODEL")
 update_param!(m, :SSPs, :SSP, "SSP1")
 update_param!(m, :SSPs, :RCPmodel, "Leach")
 update_param!(m, :SSPs, :RCP, "RCP1.9")
-update_param!(m, :SSPs, :country_names, all_countries.ISO)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
 
 error_msg = (try eval(run(m)) catch err err end).msg
 @test occursin("Model NOT A MODEL provided to SSPs component SSPmodel parameter not found in available list:", error_msg)
@@ -88,6 +88,8 @@ error_msg = (try eval(run(m)) catch err err end).msg
 
 # Leach and Benveniste
 
+all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "Benveniste_ISO3.csv")) |> DataFrame
+
 RCPmodel = "Leach"
 RCP = "RCP4.5"
 SSPmodel = "Benveniste"
@@ -95,13 +97,13 @@ SSP = "SSP2"
 
 m = Model()
 set_dimension!(m, :time, 1750:2300)
-set_dimension!(m, :country, all_countries.ISO)
+set_dimension!(m, :country, all_countries.ISO3)
 add_comp!(m, MimiSSPs.SSPs, first = 1950, last = 2300)
 update_param!(m, :SSPs, :SSPmodel, SSPmodel)
 update_param!(m, :SSPs, :SSP, SSP)
 update_param!(m, :SSPs, :RCPmodel, RCPmodel)
 update_param!(m, :SSPs, :RCP, RCP)
-update_param!(m, :SSPs, :country_names, all_countries.ISO)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
 
 run(m)
 
@@ -123,16 +125,16 @@ emissions_data = load(emissions_path, skiplines_begin = 6)|>
 socioeconomic_path = joinpath(@__DIR__, "..", "data", "socioeconomic", "$(SSPmodel)_$(SSP).csv")
 socioeconomic_data = load(socioeconomic_path) |> DataFrame
 
-for country in all_countries.ISO
+for country in all_countries.ISO3
 
     pop_data_model = getdataframe(m, :SSPs, :population) |>
-        @filter(_.time in collect(1950:2300) && _.countries == country) |>
+        @filter(_.time in collect(1950:2300) && _.country == country) |>
         DataFrame |>
         @orderby(:time) |>
         DataFrame
 
     gdp_data_model = getdataframe(m, :SSPs, :gdp) |>
-        @filter(_.time in collect(1950:2300) && _.countries == country) |>
+        @filter(_.time in collect(1950:2300) && _.country == country) |>
         DataFrame |>
         @orderby(:time) |>
         DataFrame
@@ -144,13 +146,17 @@ for country in all_countries.ISO
         DataFrame
 
     @test pop_data_model.population  ≈ socioeconomic_data_country.pop  atol = 1e-9
-    @test gdp_data_model.gdp  ≈ socioeconomic_data_country.gdp  atol = 1e-9
+    @test collect(skipmissing(gdp_data_model.gdp))  ≈ collect(skipmissing(socioeconomic_data_country.gdp))  atol = 1e-9 # some missing data ex. TWN
 end
 
-# IIASA GDP
+# IIASA GDP 
+
+all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "IIASA GDP_ISO3.csv")) |> DataFrame
 
 SSPmodel = "IIASA GDP"
+set_dimension!(m, :country, all_countries.ISO3)
 update_param!(m, :SSPs, :SSPmodel, SSPmodel)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
 @test_throws ErrorException run(m) # can't run starting in 1950
 
 Mimi.set_first_last!(m, :SSPs, first = 2010)
@@ -174,16 +180,16 @@ emissions_data = load(emissions_path, skiplines_begin = 6)|>
 socioeconomic_path = joinpath(@__DIR__, "..", "data", "socioeconomic", "$(SSPmodel)_$(SSP).csv")
 socioeconomic_data = load(socioeconomic_path) |> DataFrame
 
-for country in all_countries.ISO
+for country in all_countries.ISO3
 
     pop_data_model = getdataframe(m, :SSPs, :population) |>
-        @filter(_.time in collect(2010:2300) && _.countries == country) |>
+        @filter(_.time in collect(2010:2300) && _.country == country) |>
         DataFrame |>
         @orderby(:time) |>
         DataFrame
 
     gdp_data_model = getdataframe(m, :SSPs, :gdp) |>
-        @filter(_.time in collect(2010:2300) && _.countries == country) |>
+        @filter(_.time in collect(2010:2300) && _.country == country) |>
         DataFrame |>
         @orderby(:time) |>
         DataFrame
