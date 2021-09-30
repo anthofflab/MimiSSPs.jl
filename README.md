@@ -95,8 +95,8 @@ As shown above, the `SSPs` component imports socioeconomic data corresponding to
 
 The available SSP models are sourced as follows:
 
-* IIASA GDP, OECD Env-Growth, PIK GDP_23: these models draw directly from the IIASA Database [here](https://tntcat.iiasa.ac.at/SspDb/dsd?Action=htmlpage&page=10) and proceed to post-process the data according to a procedure outlined in the Github Repository [openmodels/SSP-Extensions](https://github.com/openmodels/SSP-Extensions), cited in [Kikstra et al., 2021](http://dx.doi.org/10.1088/1748-9326/ac1d0b) and described/replicated in detail in `calibration/src/Kikstra_Rising.ipynb`
-* Benvensite: see []()
+* IIASA GDP, OECD Env-Growth, PIK GDP_23: these models draw directly from the IIASA Database [here](https://tntcat.iiasa.ac.at/SspDb/dsd?Action=htmlpage&page=10) from Riahi et al., 2017 and proceed to post-process the data according to a procedure outlined in the Github Repository [openmodels/SSP-Extensions](https://github.com/openmodels/SSP-Extensions), cited in [Kikstra et al., 2021](http://dx.doi.org/10.1088/1748-9326/ac1d0b) and described/replicated in detail in `calibration/src/Kikstra_Rising.ipynb`
+* Benvensite: Benveniste, H., Oppenheimer, M., & Fleurbaey, M. (2020). Effect of border policy on exposure and vulnerability to climate change. Proceedings of the National Academy of Sciences, 117(43), 26692-26702.
 
 The available RCP models are sourced as follows:
 
