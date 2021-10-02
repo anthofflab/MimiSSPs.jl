@@ -2,7 +2,7 @@
 
 This repository holds a component using the [Mimi](https://www.mimiframework.org) framework which provides [Shared Socioeconomic Pathways](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) parameters, including socioeconomic (population and GDP) and emissions (CO2, CH4, CH4, and SF6), to be connected with as desired with other Mimi components and run in Mimi models. More specifically, the model takes data inputs derived from the SSPs but necessarily with an annual timestep and at the country spatial resolution for socioeconomic variables and global spatial resolution for emissions.
 
-The goal is a template where users can open a PR to add their own datasets, or do so locally, and employ the component.  We welcome this please feel free to open a PR, or an issue, to further discuss use cases or contributions. As repository authors **we do not** formally endorse the sources available, but do but do provide information on source, cited literature, pre-processing/post-processing, and calibration and require that from those hoping to add more source options to the repository (which we welcome!).  
+The goal is a template where users can open a PR to add their own datasets, or do so locally, and employ the component.  We welcome this please feel free to open a PR, or an issue, to further discuss use cases or contributions. As repository authors **we do not** formally gaurantee the sources available, but do provide information on source, cited literature, pre-processing/post-processing, and calibration and require that from those hoping to add more options to the repository (which we welcome!).  
 
 ## Preparing the Software Environment
 
