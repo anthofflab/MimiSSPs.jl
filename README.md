@@ -86,7 +86,9 @@ getdataframe(m, :PopulationAggregator, :output)
 As shown above, the `SSPs` component imports socioeconomic data corresponding to a provided SSP model and SSP, and emissions data corresponding to RCP model and Representative Concentration Pathway (RCP).  Note that much work has been done to pair each RCP with an SSP, as described by [Carbon Brief](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change) so there are customary pairings as noted below, but we leave it to the user to decide which they wish to use.
 
 * `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
-* `SSPmodel` options: IIASA GDP, OECD Env-Growth, PIK GDP_23, and Benveniste
+* `SSPmodel` options: Benveniste, IIASA GDP*, OECD Env-Growth*, PIK GDP_32*
+
+_***IMPORANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three._
 
 * `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1),  RCP4.5 (suggested pairing with SSP2), RCP7.0 (suggested pairing with SSP3), and RCP8.5 (suggested pairing with SSP5)
 * `RCPmodel` options: Leach
@@ -95,8 +97,8 @@ As shown above, the `SSPs` component imports socioeconomic data corresponding to
 
 The available SSP models are sourced as follows:
 
-* IIASA GDP, OECD Env-Growth, PIK GDP_23: these models draw directly from the IIASA Database [here](https://tntcat.iiasa.ac.at/SspDb/dsd?Action=htmlpage&page=10) from Riahi et al., 2017 and proceed to post-process the data according to a procedure outlined in the Github Repository [openmodels/SSP-Extensions](https://github.com/openmodels/SSP-Extensions), cited in [Kikstra et al., 2021](http://dx.doi.org/10.1088/1748-9326/ac1d0b) and described/replicated in detail in `calibration/src/Kikstra_Rising.ipynb`
 * Benvensite: Benveniste, H., Oppenheimer, M., & Fleurbaey, M. (2020). Effect of border policy on exposure and vulnerability to climate change. Proceedings of the National Academy of Sciences, 117(43), 26692-26702.
+* IIASA GDP, OECD Env-Growth, PIK GDP-32: these models draw directly from the IIASA Database [here](https://tntcat.iiasa.ac.at/SspDb/dsd?Action=htmlpage&page=10) from Riahi et al., 2017 and proceed to post-process the data according to a procedure outlined in the Github Repository [openmodels/SSP-Extensions](https://github.com/openmodels/SSP-Extensions), cited in [Kikstra et al., 2021](http://dx.doi.org/10.1088/1748-9326/ac1d0b) and described/replicated in detail in `calibration/src/Kikstra_Rising.ipynb`.  Again, as stated above, **please note** that these three options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three.
 
 The available RCP models are sourced as follows:
 
@@ -108,7 +110,7 @@ For futher information on each of these data sources and the related data proces
 
 SSP models:
 
-* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra-Rising_Calibration.ipynb` and Kikstra et al. 2021 replication code
+* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra-Rising_Calibration.ipynb (_in progres, not all replication code available yet_)
 * Benvensite: `calibration/Benveniste/Benveniste_Calibration.ipynb` and Benveniste et al., 2020 replication code
 
 RCP Models:
@@ -117,4 +119,4 @@ RCP Models:
 
 ## News/Upcoming
 
-* We have carbon dioxide emissions from Benveniste et al., 2020 availble soon, although these run 1950 to 3000 and are only available for the one gas (not CH4, N2O, and SF6) so we have not yet determined how to properly incorprate them
+* We have carbon dioxide emissions from Benveniste et al., 2020 availble soon, although these run 1950 to 3000 and are only available for the one gas (not CH4, N2O, and SF6) so we have not yet determined how to properly incorporate them
