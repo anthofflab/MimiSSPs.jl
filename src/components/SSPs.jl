@@ -54,8 +54,9 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         # must exist in the SSP socioeconomics dataframe 
 
         missing_countries = []
+        unique_country_list = unique(g_ssp_datasets[ssp_dict_key].country)
         for country in p.country_names
-            !(country in unique(g_ssp_datasets[ssp_dict_key].country)) && push!(missing_countries, country)
+            !(country in unique_country_list) && push!(missing_countries, country)
         end
         !isempty(missing_countries) && error("All countries in countries parameter must be found in SSPs component Socioeconomic Dataframe, the following were not found: $(missing_countries)")
 
@@ -93,10 +94,10 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         year_label = gettime(t)
 
         # check that we only run the component where we have data
-        if !(year_label in unique(g_ssp_datasets[ssp_dict_key].year))
+        if !(year_label in g_ssp_datasets[ssp_dict_key].year)
             error("Cannot run SSP component in year $(year_label), SSP socioeconomic variables not available for this model and year.")
         end
-        if !(year_label in unique(g_rcp_datasets[rcp_dict_key].year))
+        if !(year_label in g_rcp_datasets[rcp_dict_key].year)
             error("Cannot run SSP component in year $(year_label), SSP emissions variables only available for this model and year.")
         end
 
