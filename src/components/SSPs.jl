@@ -98,7 +98,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
             error("Cannot run SSP component in year $(year_label), SSP socioeconomic variables not available for this model and year.")
         end
         if !(year_label in g_rcp_datasets[rcp_dict_key].year)
-            error("Cannot run SSP component in year $(year_label), SSP emissions variables only available for this model and year.")
+            error("Cannot run SSP component in year $(year_label), SSP emissions variables not available for this model and year.")
         end
 
         # ----------------------------------------------------------------------
