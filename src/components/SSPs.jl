@@ -40,7 +40,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
         # ----------------------------------------------------------------------
         # Load Socioeconomic Data as Needed
-        #   population in billions of individuals
+        #   population in millions of individuals
         #   GDP in billions of $2005 USD
 
         socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "$(p.SSPmodel)_$(p.SSP).csv")
