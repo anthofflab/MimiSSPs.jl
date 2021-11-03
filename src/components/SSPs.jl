@@ -14,7 +14,9 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
     # TODO double check units on gases, do we want any other gases or parameters?
     population      = Variable(index=[time, country], unit="million")
+    population_global  = Variable(index=[time], unit="million")
     gdp             = Variable(index=[time, country], unit="billion US\$2005/yr")
+    gdp_global         = Variable(index=[time], unit="billion US\$2005/yr")
 
     co2_emissions   = Variable(index=[time], unit="GtC/yr")
     ch4_emissions   = Variable(index=[time], unit="MtCH4/yr")
@@ -118,6 +120,10 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
         v.population[t,:] = subset.pop[order]
         v.gdp[t,:] = subset.gdp[order]
+        
+        # add global data for future accessibility and quality control
+        v.population_global[t] = sum(v.population[t,:])
+        v.gdp_global[t] = sum(v.gdp[t,:])
 
         # ----------------------------------------------------------------------
         # Emissions
