@@ -90,7 +90,7 @@ As shown above, the `SSPs` component imports socioeconomic data corresponding to
 * `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
 * `SSPmodel` options: Benveniste, IIASA GDP*, OECD Env-Growth*, PIK GDP_32*
 
-_***IMPORANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three._
+_***IMPORTANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three._
 
 * `RCP` options: RCP1.9 (suggested pairing with SSP1), RCP2.6 (suggested pairing with SSP1),  RCP4.5 (suggested pairing with SSP2), RCP7.0 (suggested pairing with SSP3), and RCP8.5 (suggested pairing with SSP5)
 * `RCPmodel` options: Leach
