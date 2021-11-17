@@ -112,7 +112,7 @@ For futher information on each of these data sources and the related data proces
 
 SSP models:
 
-* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra-Rising_Calibration.ipynb (_in progres, not all replication code available yet_)
+* IIASA GDP, OECD Env-Growth, PIK GDP_23: `calibration/src/Kikstra-Rising_Calibration.ipynb` (_in progress, not all replication code available yet_)
 * Benvensite: `calibration/Benveniste/Benveniste_Calibration.ipynb` and Benveniste et al., 2020 replication code
 
 RCP Models:
