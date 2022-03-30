@@ -13,10 +13,10 @@ add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
 set_dimension!(m, :country, inputregions)
 update_param!(m, :SSPs, :country_names, inputregions)
 
-update_param!(m, :SSPs, :SSPmodel, "OECD Env-Growth")
+update_param!(m, :SSPs, :SSP_source, "OECD Env-Growth")
 update_param!(m, :SSPs, :SSP, "SSP1")
-update_param!(m, :SSPs, :RCPmodel, "Leach")
-update_param!(m, :SSPs, :RCP, "RCP1.9")
+update_param!(m, :SSPs, :emissions_source, "Leach")
+update_param!(m, :SSPs, :emissions_scenario, "SSP119")
 
 # Handle the MimiSSPs.RegionAggregatorSum component
 add_comp!(m, MimiSSPs.RegionAggregatorSum, first = 2010, last = 2300)
