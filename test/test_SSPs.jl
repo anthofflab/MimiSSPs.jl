@@ -149,16 +149,29 @@ for country in all_countries.ISO3
     @test collect(skipmissing(gdp_data_model.gdp))  ≈ collect(skipmissing(socioeconomic_data_country.gdp))  atol = 1e-9 # some missing data ex. TWN
 end
 
-# IIASA GDP 
+# IIASA GDP and Leach
 
 all_countries = load(joinpath(@__DIR__, "..", "data", "keys", "IIASA GDP_ISO3.csv")) |> DataFrame
 
+emissions_source = "Leach"
+emissions_scenario = "SSP245"
 SSP_source = "IIASA GDP"
-set_dimension!(m, :country, all_countries.ISO3)
-update_param!(m, :SSPs, :SSP_source, SSP_source)
-update_param!(m, :SSPs, :country_names, all_countries.ISO3)
-@test_throws ErrorException run(m) # can't run starting in 1950
+SSP = "SSP2"
 
+m = Model()
+set_dimension!(m, :time, 1750:2300)
+set_dimension!(m, :country, all_countries.ISO3)
+add_comp!(m, MimiSSPs.SSPs, first = 2010, last = 2300)
+update_param!(m, :SSPs, :SSP_source, SSP_source)
+update_param!(m, :SSPs, :SSP, SSP)
+update_param!(m, :SSPs, :emissions_source, emissions_source)
+update_param!(m, :SSPs, :emissions_scenario, emissions_scenario)
+update_param!(m, :SSPs, :country_names, all_countries.ISO3)
+
+run(m)
+
+Mimi.set_first_last!(m, :SSPs, first = 1950)
+@test_throws ErrorException run(m) # can't run starting in 1950
 Mimi.set_first_last!(m, :SSPs, first = 2010)
 run(m)
 
