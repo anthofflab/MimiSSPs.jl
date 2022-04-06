@@ -5,23 +5,22 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
 
     country = Index()
 
-    SSPmodel   = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, PIK GDP_32, and Benveniste
-    SSP     = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP4, SSP5
-    RCPmodel   = Parameter{String}() # can be one of Leach
-    RCP     = Parameter{String}() # can be one of RCP1.9, RCP2.6, RCP4.5, RCP7.0, or RCP8.5
+    SSP_source          = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, PIK GDP_32, and Benveniste
+    SSP                 = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP4, SSP5
+    emissions_source    = Parameter{String}() # can be one of Leach
+    emissions_scenario  = Parameter{String}() # can be one of SSP119, SSP126, SSP245, SSP370, SSP460, SSP585 - specific to the emissions_source you are using
 
-    country_names = Parameter{String}(index=[country]) # need the names of the countries from the dimension
+    country_names       = Parameter{String}(index=[country]) # need the names of the countries from the dimension
 
-    # TODO double check units on gases, do we want any other gases or parameters?
-    population      = Variable(index=[time, country], unit="million")
-    population_global  = Variable(index=[time], unit="million")
-    gdp             = Variable(index=[time, country], unit="billion US\$2005/yr")
-    gdp_global         = Variable(index=[time], unit="billion US\$2005/yr")
+    population          = Variable(index=[time, country], unit="million")
+    population_global   = Variable(index=[time], unit="million")
+    gdp                 = Variable(index=[time, country], unit="billion US\$2005/yr")
+    gdp_global          = Variable(index=[time], unit="billion US\$2005/yr")
 
-    co2_emissions   = Variable(index=[time], unit="GtC/yr")
-    ch4_emissions   = Variable(index=[time], unit="MtCH4/yr")
-    n2o_emissions   = Variable(index=[time], unit="MtN/yr")
-    sf6_emissions   = Variable(index=[time], unit="MtSF6/yr")
+    co2_emissions       = Variable(index=[time], unit="GtC/yr")
+    ch4_emissions       = Variable(index=[time], unit="MtCH4/yr")
+    n2o_emissions       = Variable(index=[time], unit="MtN/yr")
+    sf6_emissions       = Variable(index=[time], unit="MtSF6/yr")
 
     function init(p,v,d)
 
@@ -29,24 +28,24 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         # Checks
 
         ssp_model_options = ["IIASA GDP", "OECD Env-Growth", "PIK GDP_23", "Benveniste"]
-        !(p.SSPmodel in ssp_model_options) && error("Model $(p.SSPmodel) provided to SSPs component SSPmodel parameter not found in available list: $(ssp_model_options)")
+        !(p.SSP_source in ssp_model_options) && error("Model $(p.SSP_source) provided to SSPs component SSP_source parameter not found in available list: $(ssp_model_options)")
         
         ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
         !(p.SSP in ssp_options) && error("SSP $(p.SSP) provided to SSPs component SSP parameter not found in available list: $(ssp_options)")
         
-        rcp_model_options = ["Leach"]
-        !(p.RCPmodel in rcp_model_options) && error("Model $(p.RCPmodel) provided to SSPs component RCPmodel parameter not found in available list: $(rcp_model_options)")
+        emissions_source_options = ["Leach"]
+        !(p.emissions_source in emissions_source_options) && error("Model $(p.emissions_source) provided to SSPs component emissions_source parameter not found in available list: $(emissions_source_options)")
         
-        rcp_options = ["RCP1.9", "RCP2.6", "RCP7.0", "RCP4.5", "RCP8.5"]
-        !(p.RCP in rcp_options) && error("RCP $(p.RCP) provided to SSPs component RCP parameter not found in available list: $(rcp_options)")
+        emissions_scenario_options = ["SSP119", "SSP126", "SSP245", "SSP370", "SSP460", "SSP585"]
+        !(p.emissions_scenario in emissions_scenario_options) && error("emissions_scenario $(p.emissions_scenario) provided to SSPs component emissions_scenario parameter not found in available list: $(emissions_scenario_options)")
 
         # ----------------------------------------------------------------------
         # Load Socioeconomic Data as Needed
         #   population in millions of individuals
         #   GDP in billions of $2005 USD
 
-        socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "$(p.SSPmodel)_$(p.SSP).csv")
-        ssp_dict_key = Symbol(p.SSPmodel, "-", p.SSP)
+        socioeconomic_path = joinpath(@__DIR__, "..", "..", "data", "socioeconomic", "$(p.SSP_source)_$(p.SSP).csv")
+        ssp_dict_key = Symbol(p.SSP_source, "-", p.SSP)
 
         if !haskey(g_ssp_datasets, ssp_dict_key)
             g_ssp_datasets[ssp_dict_key] = load(socioeconomic_path) |> DataFrame
@@ -69,11 +68,11 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         #   methane emissions in MtCH4
         #   SF6 emissions in MtSF6
 
-        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "$(p.RCPmodel)_$(p.RCP).csv")
-        rcp_dict_key = Symbol(p.RCPmodel, "-", p.RCP)
+        emissions_path = joinpath(@__DIR__, "..", "..", "data", "emissions", "$(p.emissions_source)_$(p.emissions_scenario).csv")
+        emissions_scenario_dict_key = Symbol(p.emissions_source, "-", p.emissions_scenario)
 
-        if !haskey(g_rcp_datasets, rcp_dict_key)
-            if p.RCPmodel == "Leach"
+        if !haskey(g_emissions_scenario_datasets, emissions_scenario_dict_key)
+            if p.emissions_source == "Leach"
                 emissions_data = load(emissions_path, skiplines_begin = 6)|> 
                         DataFrame |> 
                         i -> rename!(i, Symbol.([:year, names(i)[2:end]...])) |> 
@@ -84,14 +83,14 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
                 emissions_data = load(emissions_path)|> DataFrame
             end
 
-            g_rcp_datasets[rcp_dict_key]= emissions_data
+            g_emissions_scenario_datasets[emissions_scenario_dict_key]= emissions_data
         end       
     end
 
     function run_timestep(p,v,d,t)
 
-        ssp_dict_key = Symbol(p.SSPmodel, "-", p.SSP)
-        rcp_dict_key = Symbol(p.RCPmodel, "-", p.RCP)
+        ssp_dict_key = Symbol(p.SSP_source, "-", p.SSP)
+        emissions_scenario_dict_key = Symbol(p.emissions_source, "-", p.emissions_scenario)
 
         year_label = gettime(t)
 
@@ -99,7 +98,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         if !(year_label in g_ssp_datasets[ssp_dict_key].year)
             error("Cannot run SSP component in year $(year_label), SSP socioeconomic variables not available for this model and year.")
         end
-        if !(year_label in g_rcp_datasets[rcp_dict_key].year)
+        if !(year_label in g_emissions_scenario_datasets[emissions_scenario_dict_key].year)
             error("Cannot run SSP component in year $(year_label), SSP emissions variables not available for this model and year.")
         end
 
@@ -128,7 +127,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         # ----------------------------------------------------------------------
         # Emissions
 
-        subset = g_rcp_datasets[rcp_dict_key] |>
+        subset = g_emissions_scenario_datasets[emissions_scenario_dict_key] |>
                     @filter(_.year == gettime(t)) |>
                     DataFrame
 
