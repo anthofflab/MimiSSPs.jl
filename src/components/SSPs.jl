@@ -8,7 +8,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
     SSP_source          = Parameter{String}() # can be one of IIASA GDP, OECD Env-Growth, PIK GDP_32, and Benveniste
     SSP                 = Parameter{String}() # can be one of SSP1, SSP2, SSP3, SSP4, SSP5
     emissions_source    = Parameter{String}() # can be one of Leach
-    emissions_scenario  = Parameter{String}() # can be one of SSP119, SSP126, SSP245, SSP370, SSP460, SSP585 - specific to the emissions_source you are using
+    emissions_scenario  = Parameter{String}() # can be one of SSP119, SSP126, SSP245, SSP370, SSP585
 
     country_names       = Parameter{String}(index=[country]) # need the names of the countries from the dimension
 
@@ -36,7 +36,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         emissions_source_options = ["Leach"]
         !(p.emissions_source in emissions_source_options) && error("Model $(p.emissions_source) provided to SSPs component emissions_source parameter not found in available list: $(emissions_source_options)")
         
-        emissions_scenario_options = ["SSP119", "SSP126", "SSP245", "SSP370", "SSP460", "SSP585"]
+        emissions_scenario_options = ["SSP119", "SSP126", "SSP245", "SSP370", "SSP585"]
         !(p.emissions_scenario in emissions_scenario_options) && error("emissions_scenario $(p.emissions_scenario) provided to SSPs component emissions_scenario parameter not found in available list: $(emissions_scenario_options)")
 
         # ----------------------------------------------------------------------
