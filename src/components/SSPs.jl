@@ -30,7 +30,7 @@ using Mimi, CSVFiles, DataFrames, Query, Interpolations
         ssp_model_options = ["IIASA GDP", "OECD Env-Growth", "PIK GDP_23", "Benveniste"]
         !(p.SSP_source in ssp_model_options) && error("Model $(p.SSP_source) provided to SSPs component SSP_source parameter not found in available list: $(ssp_model_options)")
         
-        ssp_options = ["SSP1", "SSP2", "SSP3", "SSP5"]
+        ssp_options = ["SSP1", "SSP2", "SSP3", "SSP4", "SSP5"]
         !(p.SSP in ssp_options) && error("SSP $(p.SSP) provided to SSPs component SSP parameter not found in available list: $(ssp_options)")
         
         emissions_source_options = ["Leach"]
