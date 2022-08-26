@@ -1,6 +1,6 @@
 name = "MimiSSPs"
 uuid = "d73ed964-a3ff-4a3d-ad09-d195fe0d0b35"
-version = "1.0.0"
+version = "1.0.1-DEV"
 
 [deps]
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
