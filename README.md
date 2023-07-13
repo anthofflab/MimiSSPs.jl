@@ -124,7 +124,7 @@ SSP models:
 
 Emissions Sources:
  
-* Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code; See notebooks here for information on processing etc.:https://github.com/FrankErrickson/MimiFAIRv2.jl/tree/main/data/scripts and see note above about rebased vs. non-rebased emissions data.
+* Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code; See notebooks here for information on processing etc.:https://github.com/FrankErrickson/MimiFAIRv2.jl/tree/main/data/scripts and **see note above about rebased vs. non-rebased emissions data**.
 
 ## News/Upcoming
 
