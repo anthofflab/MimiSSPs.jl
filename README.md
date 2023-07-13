@@ -100,7 +100,7 @@ _***IMPORTANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 
   
 _**IMPORTANT** As described in [MimiFAIRv2 data processing scripts](https://github.com/FrankErrickson/MimiFAIRv2.jl/tree/main/data/scripts), we have the option of two slightly different sources of data from Leach et. al. 2021.  The first set are taken directly from the RCMIP data source using functions provided in the Python FAIRv2.0 repository. The second set rebase a subset of gases to `0.` in the year 1750.  The latter are used by FAIR2.0.0, and are the default for the MimiFAIRv2.0 repository in order to replicate that paper. The former (non-rebased) are included here, for clarity of use and more direct replication of the RCMIP protocol._
 
-Te rebased gases are `["so2","nox","co","nmvoc","bc","nh3","oc","nox_avi","methyl_bromide","methyl_chloride","chcl3","ch2cl2"]`, as indicated in *notebooks/RCMIP/RCMIP-experiments.ipynb* from the FAIRv2.0.0-alpha from the replication code here: paper replication code here: https://github.com/njleach/leach-et-al-2021/tree/a4f8c73f3b45c8e82e70c5906f73e6ebad327954 and are labeled
+The rebased gases are `["so2","nox","co","nmvoc","bc","nh3","oc","nox_avi","methyl_bromide","methyl_chloride","chcl3","ch2cl2"]`, as indicated in *notebooks/RCMIP/RCMIP-experiments.ipynb* from the FAIRv2.0.0-alpha from the replication code here: paper replication code here: https://github.com/njleach/leach-et-al-2021/tree/a4f8c73f3b45c8e82e70c5906f73e6ebad327954 and are labeled
 
 ### Data Sources
 
