@@ -92,7 +92,7 @@ As shown above, the `SSPs` component imports the following with the following op
 * `SSP_source` options: Benveniste, IIASA GDP*, OECD Env-Growth*, PIK GDP_32*
 * `SSP` option: SSP1, SSP2, SSP3, SSP4, SSP5
 
-_***IMPORTANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three._
+_**IMPORTANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 options are currently experimental implementations of Kikstra et al., 2021 and are under development, we advise using Benveniste for now and contacting the authors of this repository if you are interested in using the other three._
 
 2. emissions data for which the user specifies (1) an emissions source and (2) an emissions scenario made up an SSP **combined** with a mitigation target as defined by a Representative Concentration Pathway (RCP).
 * `emissions_scenario` options: Leach
