@@ -97,8 +97,6 @@ _**IMPORTANT** Please note that the IIASA GDP, OECD Env-Growth, and PIK GDP_23 o
 2. emissions data for which the user specifies (1) an emissions source and (2) an emissions scenario made up an SSP **combined** with a mitigation target as defined by a Representative Concentration Pathway (RCP).
 * `emissions_scenario` options: Leach
 * `emissions_source` options:  SSP119, SSP126, SSP245, SSP370, SSP585
-  
-_**IMPORTANT** As described in [MimiFAIRv2 data processing scripts](https://github.com/FrankErrickson/MimiFAIRv2.jl/tree/main/data/scripts), we have the option of two slightly different sources of data from Leach et. al. 2021.  The first set are taken directly from the RCMIP data source using functions provided in the Python FAIRv2.0 repository. The second set rebase a subset of gases to `0.` in the year 1750.  The latter are used by FAIR2.0.0, and are the default for the MimiFAIRv2.0 repository in order to replicate that paper. The former (non-rebased) are included here, for clarity of use and more direct replication of the RCMIP protocol. The rebased gases are `["so2","nox","co","nmvoc","bc","nh3","oc","nox_avi","methyl_bromide","methyl_chloride","chcl3","ch2cl2"]`, as indicated in *notebooks/RCMIP/RCMIP-experiments.ipynb* from the FAIRv2.0.0-alpha from the [replication code](https://github.com/njleach/leach-et-al-2021/tree/a4f8c73f3b45c8e82e70c5906f73e6ebad327954)_
 
 ### Data Sources
 
@@ -109,7 +107,7 @@ The available SSP sources are as follows:
 
 The available emissions sources are as follows:
 
-* Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication.
+* Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication, which draws heavily on code in [MimiFAIRv2]().
 
 ### Calibration and Data Processing
 
@@ -122,7 +120,7 @@ SSP models:
 
 Emissions Sources:
  
-* Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code; See notebooks here for information on processing etc.:https://github.com/FrankErrickson/MimiFAIRv2.jl/tree/main/data/scripts and **see note above about rebased vs. non-rebased emissions data**.
+* Leach: `calibration/Leach/Leach_Calibration.ipynb` and Leach et al. 2021 replication code.
 
 ## News/Upcoming
 
