@@ -107,7 +107,7 @@ The available SSP sources are as follows:
 
 The available emissions sources are as follows:
 
-* Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication, which draws heavily on code in [MimiFAIRv2]().
+* Leach: This model draws data directly from the FAIRv2.0 model repository [here](https://github.com/FrankErrickson/MimiFAIRv2.jl) and originally published in [Leach et al., 2021](https://doi.org/10.5194/gmd-14-3007-2021), see `calibration/src/Leach.ipynb` for replication, which draws heavily on code in [MimiFAIRv2](). (note rebasing of several gases to 0 in 1750 to replicate FAIRv2.0.0 publication -- described in calibration notebook and referenced code)
 
 ### Calibration and Data Processing
 
