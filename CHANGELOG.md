@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [2.0.0]
+## [2.0.0] - 2026-04-28
 
 ### Changed
 - Raised the minimum supported Julia version to 1.10.
