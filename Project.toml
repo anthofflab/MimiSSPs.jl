@@ -14,6 +14,7 @@ Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [compat]
 Downloads = "1"
@@ -27,4 +28,4 @@ Missings = "1"
 Interpolations = "0.13, 0.14, 0.15"
 
 [targets]
-test = ["Test"]
+test = ["Test", "TestItemRunner"]
