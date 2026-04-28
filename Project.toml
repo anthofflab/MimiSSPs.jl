@@ -1,6 +1,6 @@
 name = "MimiSSPs"
 uuid = "d73ed964-a3ff-4a3d-ad09-d195fe0d0b35"
-version = "1.0.3-DEV"
+version = "2.0.0"
 
 [deps]
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
@@ -13,8 +13,8 @@ Missings = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Downloads = "1"
